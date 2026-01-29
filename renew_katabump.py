@@ -100,7 +100,7 @@ class KatabumpAutoRenew:
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         if PROXY_SERVER:
             chrome_options.add_argument(f'--proxy-server={PROXY_SERVER}')
-        v_env = os.getenv('CHROME_VERSION')
+        v_env = os.getenv('CHROME_VERSION', '')
         v_main = int(v_env) if v_env.isdigit() else None
         logger.info(f"🛠️ 驱动初始化 - 指定大版本: {v_main or '自动探测'}")
         try:
