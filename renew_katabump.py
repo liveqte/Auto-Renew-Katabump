@@ -100,7 +100,12 @@ class KatabumpAutoRenew:
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         if PROXY_SERVER:
             chrome_options.add_argument(f'--proxy-server={PROXY_SERVER}')
-        self.driver = uc.Chrome(options=chrome_options, headless=HEADLESS)
+        v_env = os.getenv('CHROME_VERSION')
+        v_main = int(v_env) if v_env and v_env.isdigit() else None
+        try:
+            self.driver = uc.Chrome(options=chrome_options, headless=HEADLESS, v_main)
+        except Exception as e:
+            self.driver = uc.Chrome(options=chrome_options, headless=HEADLESS)
         self.driver.set_window_size(1280, 720)
 
     def process(self):
