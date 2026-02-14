@@ -1,0 +1,60 @@
+name: Update README timestamp
+
+on:
+  schedule:
+    - cron: '0 0 10 * *'
+  workflow_dispatch: {}
+
+jobs:
+  update-readme-timestamp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update README timestamp
+        run: |
+          set -e
+
+          FILE="README.md"
+          TS="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          LINE="Last workflow run: ${TS}"
+
+          # 如果 README 不存在，直接创建
+          if [ ! -f "$FILE" ]; then
+            printf '%s\n\n' "# README" > "$FILE"
+            printf '%s\n' "$LINE" >> "$FILE"
+          else
+            # 判断是否已有时间戳行（以 'Last workflow run:' 开头）
+            if grep -qE '^Last workflow run:' "$FILE"; then
+              # 替换已有时间戳行
+              sed -i 's/^Last workflow run:.*/'"${LINE//\//\\/}"'/' "$FILE"
+            else
+              # 保证末尾有一个空行，再追加时间戳
+              # 1. 如果文件最后一行不是空行，先加一个空行
+              if [ -n "$(tail -n 1 "$FILE")" ]; then
+                printf '\n' >> "$FILE"
+              fi
+              # 2. 追加时间戳行
+              printf '%s\n' "$LINE" >> "$FILE"
+            fi
+          fi
+
+          echo "Updated timestamp line to: $LINE"
+
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add README.md
+          git commit -m "chore: update README timestamp"
+          git push
