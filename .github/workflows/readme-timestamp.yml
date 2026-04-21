@@ -11,6 +11,9 @@ jobs:
     permissions:
       actions: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Clear Old Workflow Runs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -28,10 +31,7 @@ jobs:
           else
             echo "ℹ️ 当前没有需要清理的历史记录。"
           fi
-          
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+        
       - name: Update README timestamp
         run: |
           set -e
