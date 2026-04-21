@@ -4,33 +4,27 @@ on:
   schedule:
     - cron: '0 0 10 * *'
   workflow_dispatch: {}
-
+  
+permissions:
+  actions: write
+  contents: read
+  
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
+          
   update-readme-timestamp:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Clear Old Workflow Runs
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "🔍 正在查找工作流 '${{ github.workflow }}' 的历史记录..."
-          
-          # 获取历史运行 ID，利用 grep -v 精准排除当前正在运行的 ID
-          # 添加 || true 防止 grep 找不到结果时返回非零退出码导致任务中断
-          RUN_IDS=$(gh run list --workflow "${{ github.workflow }}" --json databaseId -q '.[].databaseId' | grep -v "^${{ github.run_id }}$" || true)
-          
-          if [ -n "$RUN_IDS" ]; then
-            echo "🗑️ 找到旧的运行记录，正在删除..."
-            echo "$RUN_IDS" | xargs -I {} gh run delete {} --yes
-            echo "✅ 清理完成！"
-          else
-            echo "ℹ️ 当前没有需要清理的历史记录。"
-          fi
         
       - name: Update README timestamp
         run: |
