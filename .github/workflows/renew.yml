@@ -13,8 +13,23 @@ jobs:
       ACCOUNTS: ${{ secrets.ACCOUNTS }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       CHAT_ID: ${{ secrets.CHAT_ID }}
+    permissions:
+      actions: write
       
     steps:
+      - name: Clear Old Workflow Runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 获取当前工作流的文件名（例如：main.yml）
+          workflow_id=$(gh run view --json workflowDatabaseId -q .workflowDatabaseId)
+          
+          # 获取除了当前运行之外的所有历史运行 ID 并删除
+          # 注意：此命令会删除该文件下所有的历史记录
+          gh run list --workflow "${{ github.workflow }}" --json databaseId -q '.[].databaseId' | \
+          grep -v "${{ github.run_id }}" | \
+          xargs -I {} gh run delete {} --yes
+          
       - name: Interval Check (Strict 4-day cycle)
         id: check
         run: |
