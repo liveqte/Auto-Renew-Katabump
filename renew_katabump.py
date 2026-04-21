@@ -104,12 +104,13 @@ class KatabumpAutoRenew:
         v_env = os.getenv('CHROME_VERSION', '')
         v_main = int(v_env) if v_env.isdigit() else None
         logger.info(f"🛠️ 驱动初始化 - 指定大版本: {v_main or '自动探测'}")
-        try:
-            self.driver = uc.Chrome(options=chrome_options, headless=HEADLESS, version_main=v_main, use_subprocess=True)
-        except Exception as e:
-            logger.warning(f"⚠️ 强制版本启动失败，尝试降级启动: {e}")
-            self.driver = uc.Chrome(options=chrome_options, headless=HEADLESS)
-        self.driver.set_window_size(1280, 720)
+        for v in [v_main, None]: # 先试指定版本，后试自动探测
+            try:
+                self.driver = uc.Chrome(options=opts, headless=HEADLESS, version_main=v, use_subprocess=True)
+                return self.driver.set_window_size(1280, 720)
+            except Exception as e:
+                if getattr(self, 'driver', None): self.driver.quit(); self.driver = None
+                if v is None: logger.error(f"❌ 驱动启动完全失败: {e}"); raise
 
     def _handle_turnstile(self, context=""):
         """优化后的 Cloudflare 验证逻辑"""
