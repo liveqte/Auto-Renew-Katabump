@@ -79,8 +79,8 @@ class KatabumpAutoRenew:
         self.password = password
         self.driver = None
         self.screenshot_path = None
-        self.masked_user = self.mask_email()
-
+        #self.masked_user = self.mask_email()
+        self.masked_user="Secret"
     def mask_email(self):
         try:
             if "@" in self.user:
