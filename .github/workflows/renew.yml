@@ -47,18 +47,18 @@ jobs:
         # 在后台启动 Xvfb，创建一个虚拟屏幕 :99
         run: Xvfb :99 -ac &
         
-      - name: Launch sing-box if VLINK set
-        env:
-          VLINK: ${{ secrets.VLINK }}
-        if: ${{ env.VLINK != '' }}
-        run: |
-            curl -LO https://amd64.ssss.nyc.mn/sb
-            curl -LO https://raw.githubusercontent.com/liveqte/jupyter-notebook-deployed/refs/heads/main/vlink_to_sb.py
-            chmod +x sb
-            python vlink_to_sb.py $VLINK > v.json
-            nohup ./sb run -c v.json > /dev/null 2>&1 &
-            sleep 3
-            echo "HTTP_PROXY=socks5://127.0.0.1:1080" >> $GITHUB_ENV
+      # - name: Launch sing-box if VLINK set
+      #   env:
+      #     VLINK: ${{ secrets.VLINK }}
+      #   if: ${{ env.VLINK != '' }}
+      #   run: |
+      #       curl -LO https://amd64.ssss.nyc.mn/sb
+      #       curl -LO https://raw.githubusercontent.com/liveqte/jupyter-notebook-deployed/refs/heads/main/vlink_to_sb.py
+      #       chmod +x sb
+      #       python vlink_to_sb.py $VLINK > v.json
+      #       nohup ./sb run -c v.json > /dev/null 2>&1 &
+      #       sleep 3
+      #       echo "HTTP_PROXY=socks5://127.0.0.1:1080" >> $GITHUB_ENV
             
       - name: Run Script in Stealth Mode (via Xvfb)
         env:
