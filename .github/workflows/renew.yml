@@ -28,14 +28,20 @@ jobs:
           pip install -r requirements.txt
           sudo apt-get update && sudo apt-get install -y xvfb
           
-      - name: Install Google Chrome
+      - name: Get Chromium Version
+        if: steps.check.outputs.run == 'true'
+        id: get_version
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+          CHROME_VERSION=$(chromium-browser --version 2>/dev/null | grep -oE 'Chromium\s[0-9]+' | grep -oE '[0-9]+')
+          if [ -z "$CHROME_VERSION" ]; then
+            CHROME_VERSION=$(google-chrome --version 2>/dev/null | grep -oE 'Chrome\s[0-9]+' | grep -oE '[0-9]+')
+          fi
+          if [ -z "$CHROME_VERSION" ]; then
+            echo "⚠️ 无法自动检测浏览器版本，使用最新稳定版本。"
+          CHROME_VERSION="144"
+          fi
+          echo "Detected Chrome/Chromium Major Version: $CHROME_VERSION"
+          echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
 
       - name: Start X Virtual Frame Buffer (Xvfb)
         # 在后台启动 Xvfb，创建一个虚拟屏幕 :99
