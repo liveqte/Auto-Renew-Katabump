@@ -28,6 +28,12 @@ jobs:
           pip install -r requirements.txt
           sudo apt-get update && sudo apt-get install -y xvfb
           
+      - name: 🌐 Setup Chrome 146
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 146
+          install-chromedriver: false
+          
       - name: Get Chromium Version
         id: get_version
         run: |
