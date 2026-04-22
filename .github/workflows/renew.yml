@@ -13,13 +13,7 @@ jobs:
     steps:
       - name: Interval Check (Strict 4-day cycle)
         id: check
-        run: |
-          # 如果是手动触发，则跳过检查直接运行
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "run=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
+        run: |        
           # 计算当前 Unix 天数 (UTC)
           DAYS=$(( $(date -u +%s) / 86400 ))
           REMAINDER=$(( $DAYS % 4 ))
