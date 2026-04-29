@@ -150,7 +150,13 @@ class KatabumpAutoRenew:
         except Exception as e:
             logger.error(f"❌ {self.masked_user} - [{context}] 验证交互失败: {e}")
             return False
-
+    def _handle_turnstile2(self):
+        checkbox_xpath = "//div[@class='altcha']//input[@type='checkbox' and @required]"
+        checkbox = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, checkbox_xpath))
+        )
+        checkbox.click()
+            
     def process(self):
         logger.info(f"🚀 开始登录账号: {self.masked_user}")
         self.driver.get("https://dashboard.katabump.com/auth/login")
@@ -252,7 +258,7 @@ class KatabumpAutoRenew:
         sleep(2000 + random.random() * 1000)
 
         # --- 续期弹窗 CF 验证 ---
-        self._handle_turnstile("Renew Modal")
+        self._handle_turnstile2()
 
         # --- 最终 Renew 按钮 ---
         try:
