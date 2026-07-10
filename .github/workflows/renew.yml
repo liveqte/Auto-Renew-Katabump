@@ -52,7 +52,11 @@ jobs:
       - name: Get Chromium Version
         id: get_version
         run: |
-          which chromium-browser
+          echo "Checking Chrome installation..." 
+          INSTALL_PATH=$(which chrome)
+          sudo ln -sf "$INSTALL_PATH" /opt/google/chrome/chrome
+          sudo ln -sf "$INSTALL_PATH" /usr/bin/chromium-browser
+          /usr/bin/chromium-browser --version
           CHROME_VERSION=$(chromium-browser --version 2>/dev/null | grep -oE 'Chromium\s[0-9]+' | grep -oE '[0-9]+')
           if [ -z "$CHROME_VERSION" ]; then
             CHROME_VERSION=$(google-chrome --version 2>/dev/null | grep -oE 'Chrome\s[0-9]+' | grep -oE '[0-9]+')
