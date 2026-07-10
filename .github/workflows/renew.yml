@@ -57,9 +57,9 @@ jobs:
           sudo ln -sf "$INSTALL_PATH" /opt/google/chrome/chrome
           sudo ln -sf "$INSTALL_PATH" /usr/bin/chromium-browser
           /usr/bin/chromium-browser --version
-          CHROME_VERSION=$(chromium-browser --version 2>/dev/null | grep -oE 'Chromium\s[0-9]+' | grep -oE '[0-9]+')
+          CHROME_VERSION=$(chromium-browser --version 2>/dev/null | grep -oE '[0-9]+' | head -n 1 || true)
           if [ -z "$CHROME_VERSION" ]; then
-            CHROME_VERSION=$(google-chrome --version 2>/dev/null | grep -oE 'Chrome\s[0-9]+' | grep -oE '[0-9]+')
+            CHROME_VERSION=$(google-chrome --version 2>/dev/null | grep -oE '[0-9]+' | head -n 1 || true)
           fi
           if [ -z "$CHROME_VERSION" ]; then
             echo "⚠️ 无法自动检测浏览器版本，使用最新稳定版本。"
